@@ -1,0 +1,45 @@
+Documentación del proyecto  
+El sistema es básicamente una aplicación web que realiza pruebas de conectividad (ping) en tiempo real a diferentes direcciones IP.
+Registra los estados, guarda el historial y muestra de forma visual (con indicadores verde/rojo) si un equipo está encendido o apagado en la red física.
+
+Tecnologías utilizadas
+
+Python y Flask (Backend):
+Flask se encarga de procesar las peticiones web, ejecutar los comandos ping, y envío de datos hacia la interfaz gráfica.
+
+HTML:
+  Define la organización de la página web y crea los formularios para añadir las IPs y las tablas donde se muestran los equipos 
+
+CSS:
+  Se encarga del aspecto visual y controla los colores de la interfaz y los márgenes.
+
+Javascript:
+  Sirve para hacer que la web funcione en tiempo real. Utiliza peticiones 
+  para comunicarse con Flask de fondo. Gracias a JavaScript no hace falta el F5
+
+Archivo JSON (base de datos):
+  Toda la información de las IPs registradas se guarda en el archivo 'datos.json'.
+
+Ubuntu (servidor):
+ Aloja el entorno virtual de Python (venv), procesa las solicitudes en segundo plano y mantiene el servidor estable.
+
+Linux systemd:
+  Para evitar depender de mantener terminales abiertas, se han creado dos 
+  servicios del sistema automatizados e inmortales:
+    1. mi_monitor.service  -> Corre la web Flask en el puerto 5000 de fondo.
+    2. ngrok.service           -> Mantiene el túnel hacia internet abierto.
+  Ambos arrancan de forma automática si el ordenador se reinicia.
+
+Ngrokl:
+Sirve para levantar una conexión segura saliente desde Ubuntu hacia la nube de Ngrok, generando una URL pública cifrada (HTTPS).
+
+pyproject.toml
+Es el archivo de configuración que le indica al sistema qué librerías de Python se necesitan descargar (como Flask) para que la aplicación funcione. 
+
+
+¿Cómo probar la web?
+Descomprimir el archivo .zip.
+Abrir una terminal dentro de la carpeta extraída.
+Ejecutar : python app.py
+
+

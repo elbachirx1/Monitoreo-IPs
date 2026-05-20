@@ -79,6 +79,12 @@ def add_device():
     nombre = request.form.get('nombre')
     ip = request.form.get('ip')
     
+    datos = leer_datos()
+    
+    for equipo in datos:
+        if equipo['ip'] == ip:
+            return render_template('index.html', mensaje=f"El equipo con IP {ip} ya está registrado. Revisa el Panel.")
+  
     if os.name == 'nt':
         comando = ['ping', '-n', '1', '-w', '1000', ip]
     else:
@@ -87,13 +93,24 @@ def add_device():
     res = subprocess.run(comando, stdout=subprocess.PIPE)
     estado_inicial = "Online" if res.returncode == 0 else "Offline"
     
-    datos = leer_datos()
     datos.append({"nombre": nombre, "ip": ip, "estado": estado_inicial, "servicios": []})
     
     with open(ARCHIVO, 'w') as f:
         json.dump(datos, f, indent=4)
         
-    return render_template('index.html')
+    return render_template('index.html', mensaje=f"Equipo '{nombre}' añadido correctamente.")
+
+
+@app.route('/api/delete/<ip>', methods=['DELETE'])
+def delete_device(ip):
+    datos = leer_datos()
+    datos_filtrados = [equipo for equipo in datos if equipo['ip'] != ip]
+    
+    with open(ARCHIVO, 'w') as f:
+        json.dump(datos_filtrados, f, indent=4)
+        
+    return jsonify({"status": "eliminado"})
+
 
 @app.route('/api/status')
 def get_status():

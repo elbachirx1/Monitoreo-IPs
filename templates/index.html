@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soporte Técnico - Registro de Equipos</title>
+    <title>Registro de Equipos</title>
     <link rel="stylesheet" href="/static/estilos.css">
 </head>
 <body>
@@ -14,6 +13,13 @@
         </header>
 
         <section class="form-section">
+            
+            {% if mensaje %}
+            <div class="alert-box" style="background-color: #fff3cd; color: #856404; padding: 10px; margin-bottom: 15px; text-align: center;">
+                <b>{{ mensaje }}</b>
+            </div>
+            {% endif %}
+
             <div class="card">
                 <h2>Añadir Dispositivo</h2>
                 <form action="/add" method="POST" class="form-group">
