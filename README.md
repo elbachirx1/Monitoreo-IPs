@@ -1,35 +1,37 @@
-Documentación del proyecto  
-El sistema es básicamente una aplicación web que realiza pruebas de conectividad (ping) en tiempo real a diferentes direcciones IP.
-Registra los estados, guarda el historial y muestra de forma visual (con indicadores verde/rojo) si un equipo está encendido o apagado en la red física.
+# Monitoreo de Conectividad IP (Ping en Tiempo Real) 
 
-Tecnologías utilizadas
+Aplicación web diseñada para realizar pruebas de conectividad (*ping*) en tiempo real a diferentes direcciones IP. El sistema registra los estados de los equipos, almacena un historial y muestra de forma visual (mediante indicadores verde/rojo) si un dispositivo está activo o inactivo en la red física.
 
-Python y Flask (Backend):
-Flask se encarga de procesar las peticiones web, ejecutar los comandos ping, y envío de datos hacia la interfaz gráfica.
+---
 
-HTML:
-  Define la organización de la página web y crea los formularios para añadir las IPs y las tablas donde se muestran los equipos 
+## Tecnologías Utilizadas
 
-CSS:
-  Se encarga del aspecto visual y controla los colores de la interfaz y los márgenes.
+* **Python & Flask (Backend):** Procesa las peticiones web, ejecuta los comandos de diagnóstico *ping* nativos del sistema y envía los datos en tiempo real hacia la interfaz.
+* **HTML5:** Define la estructura semántica de la página, los formularios de entrada para nuevas IPs y las tablas de visualización.
+* **CSS3:** Controla el aspecto visual, estilos de los indicadores de estado, márgenes y diseño adaptativo.
+* **JavaScript (Frontend):** Gestiona la actualización asíncrona de la interfaz en tiempo real mediante peticiones en segundo plano al servidor, eliminando la necesidad de recargar la página manualmente.
+* **Archivo JSON (Persistencia):** Actúa como base de datos ligera. Toda la información y estados de las IPs registradas se almacenan en el archivo `datos.json`.
+* **Ubuntu (Servidor de Despliegue):** Entorno de producción que aloja el entorno virtual de Python (`venv`), procesa las solicitudes en segundo plano y asegura la estabilidad del servicio.
+* **pyproject.toml:** Archivo de configuración moderno para la gestión de dependencias, indicando las librerías necesarias (como Flask) para el entorno.
 
-Javascript:
-  Sirve para hacer que la web funcione en tiempo real. Utiliza peticiones 
-  para comunicarse con Flask de fondo. Gracias a JavaScript no hace falta el F5
+---
 
-Archivo JSON (base de datos):
-  Toda la información de las IPs registradas se guarda en el archivo 'datos.json'.
+## Instrucciones de Ejecución
 
-Ubuntu (servidor):
- Aloja el entorno virtual de Python (venv), procesa las solicitudes en segundo plano y mantiene el servidor estable.
+Sigue estos pasos para probar la aplicación en tu entorno local:
 
-pyproject.toml
-Es el archivo de configuración que le indica al sistema qué librerías de Python se necesitan descargar (como Flask) para que la aplicación funcione. 
+1. **Descomprimir** el archivo `.zip` del proyecto.
+2. **Abrir una terminal** o línea de comandos dentro de la carpeta extraída.
+3. **Ejecutar** el servidor según tu sistema operativo:
 
+* **Linux / macOS:**
+  ```bash
+  python3 app.py
+  ```
 
-¿Cómo probar la web?
-1. Descomprimir el archivo .zip.<br>
-2. Abrir una terminal dentro de la carpeta extraída.<br>
-3. Ejecutar: python3 app.py (linux) / py app.py (windows)
+* **Windows:**
+  ```cmd
+  py app.py
+  ```
 
-
+4. **Acceder** a la aplicación abriendo tu navegador web e ingresando a la dirección local que te indique la terminal (por defecto `http://127.0.0.1:5000`).
