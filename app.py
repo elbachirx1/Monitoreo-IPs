@@ -31,6 +31,13 @@ if not in_venv():  # si no estamos en la burbuja se crea y se entra en ella
     subprocess.run([venv_python, script_actual] + sys.argv[1:])
     sys.exit(0)
 
+
+
+
+
+
+
+
 import json
 import socket
 import webbrowser
@@ -78,6 +85,7 @@ def panel():
 def add_device():
     nombre = request.form.get('nombre')
     ip = request.form.get('ip')
+    tasa_actualizacion = request.form.get('tasa_actualizacion')
     
     datos = leer_datos()
     
@@ -93,7 +101,11 @@ def add_device():
     res = subprocess.run(comando, stdout=subprocess.PIPE)
     estado_inicial = "Online" if res.returncode == 0 else "Offline"
     
-    datos.append({"nombre": nombre, "ip": ip, "estado": estado_inicial, "servicios": []})
+    datos.append({"nombre": nombre,
+                  "ip": ip,
+                  "estado": estado_inicial,
+                  "tasa_actualizacion": tasa_actualizacion,
+                  "servicios": []})
     
     with open(ARCHIVO, 'w') as f:
         json.dump(datos, f, indent=4)
@@ -104,7 +116,9 @@ def add_device():
 @app.route('/api/delete/<ip>', methods=['DELETE'])
 def delete_device(ip):
     datos = leer_datos()
-    datos_filtrados = [equipo for equipo in datos if equipo['ip'] != ip]
+    ip_a_borrar = ip.strip()
+    
+    datos_filtrados = [equipo for equipo in datos if equipo['ip'].strip() != ip_a_borrar]
     
     with open(ARCHIVO, 'w') as f:
         json.dump(datos_filtrados, f, indent=4)
@@ -126,7 +140,7 @@ def get_status():
         
         if res.returncode == 0:
             equipo['estado'] = "Online"
-            # SOLO si está Online, buscamos servicios
+            # solo si está online, buscamos servicios
             equipo['servicios'] = obtener_servicios(equipo['ip'])
             
         else:
@@ -137,6 +151,59 @@ def get_status():
         json.dump(equipos, f, indent=4)
     
     return jsonify(equipos)
+
+
+@app.route('/api/status/<ip>')
+def get_single_status(ip):
+    equipos = leer_datos()
+    equipo = next((e for e in equipos if e['ip'] == ip), None)
+    
+    if not equipo:
+        return jsonify({"error": "Equipo no encontrado"}), 404
+
+    if os.name == 'nt':
+        comando = ['ping', '-n', '1', '-w', '1000', equipo['ip']]
+    else:
+        comando = ['ping', '-c', '1', '-w', '1', equipo['ip']]
+        
+    res = subprocess.run(comando, stdout=subprocess.PIPE)
+    
+    if res.returncode == 0:
+        equipo['estado'] = "Online"
+        equipo['servicios'] = obtener_servicios(equipo['ip'])
+    else:
+        equipo['estado'] = "Offline"
+        equipo['servicios'] = []
+
+    with open(ARCHIVO, 'w') as f:
+        json.dump(equipos, f, indent=4)
+        
+    return jsonify(equipo)
+
+@app.route('/api/update_tasa', methods=['POST'])
+def update_tasa():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No se recibieron datos"}), 400
+        
+    ip_objetivo = data.get('ip', '').strip()
+    nueva_tasa = data.get('tasa_actualizacion', '').strip()
+    
+    datos = leer_datos()
+    modificado = False
+    
+    for equipo in datos:
+        if equipo['ip'].strip() == ip_objetivo:
+            equipo['tasa_actualizacion'] = nueva_tasa
+            modificado = True
+            break
+            
+    if modificado:
+        with open(ARCHIVO, 'w') as f:
+            json.dump(datos, f, indent=4)
+        return jsonify({"status": "actualizado", "nueva_tasa": nueva_tasa})
+        
+    return jsonify({"error": "Equipo no encontrado"}), 404
 
 
 def abrir_navegador():
